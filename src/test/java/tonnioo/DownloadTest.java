@@ -6,20 +6,17 @@ import com.codeborne.xlstest.XLS;
 import com.opencsv.CSVReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-
 import static com.codeborne.selenide.Selenide.$;
 import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class DownloadTest {
     ClassLoader cl = DownloadTest.class.getClassLoader();
@@ -67,8 +64,9 @@ public class DownloadTest {
             );
         }
     }
+
     @Test
-    void xlsParsingTest2() throws Exception{
+    void xlsParsingTest2() throws Exception {
         Selenide.open("http://romashka2008.ru/price");
         File xlsDownload = Selenide.$(".site-main__inner a[href*='prajs_ot']").download();
         XLS xls = new XLS(xlsDownload);
@@ -79,4 +77,29 @@ public class DownloadTest {
                 .getCell(1)
                 .getStringCellValue()).contains("693010");
     }
+
+    @Test
+    void zipParsingTest() throws Exception {
+        try(InputStream is = cl.getResourceAsStream("zip/123.zip");
+        ZipInputStream zis = new ZipInputStream(is)) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null);
+            org.assertj.core.api.Assertions.assertThat(entry.getName()).isEqualTo("123.txt");
+
+        }
+    }
+
+    @Test
+    void zipParsingTest2()  throws Exception{
+        ZipInputStream is = new ZipInputStream(cl.getResourceAsStream("zip/123.zip/"));
+        ZipEntry entry;
+        while ((entry = is.getNextEntry()) != null){
+            org.assertj.core.api.Assertions.assertThat(entry.getName()).isEqualTo("123.txt");
+
+
+        }
+
+    }
 }
+
+
